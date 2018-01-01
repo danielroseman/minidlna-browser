@@ -1,0 +1,36 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+<script type="text/javascript">
+$(function() {
+  var clip = new Clipboard('.btn');
+  clip.on('success', function(e) {
+    $('#status').text(e.text + ' copied');
+  });
+})
+</script>
+</head>
+<body>
+{% if parent_id %}
+{{ path }}
+<a href="{{ url_for('browse', object_id=parent_id) }}">Up</a>
+{% endif %}
+
+<ul>
+{% for item in items %}
+<li>
+  {% if item.class.startswith('container') %}
+    <a href="{{ url_for('browse', object_id=item.object_id) }}">{{ item.name }}</a>
+  {% else %}
+    {{ item.name }}
+    {# - <span class="url_to_copy" id="url_{{ item.detail_id }}">{{ BASE_URL }}{{ item.detail_id }}</span> #}
+    <button class="btn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"><img src="{{ url_for('static', filename='clippy.svg') }}" alt="Copy to clipboard" width=13></button>
+  {% endif %}
+</li>
+{% endfor %}
+</ul>
+
+<div id="status"></div>
+</body>
+</html>

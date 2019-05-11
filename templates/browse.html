@@ -13,18 +13,26 @@ $(function() {
 </head>
 <body>
 {% if parent_id %}
-{{ path }}
-<a href="{{ url_for('browse', object_id=parent_id) }}">Up</a>
+<h3>{{ path }}</h3>
+{% else %}
+<h3>MiniDLNA Database Browser</h3>
 {% endif %}
-
-<ul>
+<ul style="list-style-type:none;">
+{% if parent_id %}
+<li><a href="{{ url_for('browse', object_id=parent_id) }}" data-minidlna-object-id="{{ parent_id }}"><img src="{{ url_for('static', filename='reply.svg') }}" alt="Parent Directory" width=26> Up</a></li>
+{% endif %}
 {% for item in items %}
 <li>
   {% if item.class.startswith('container') %}
-    <a href="{{ url_for('browse', object_id=item.object_id) }}">{{ item.name }}</a>
+    <a href="{{ url_for('browse', object_id=item.object_id) }}" data-minidlna-object-id="{{ item.object_id }}"><img src="{{ url_for('static', filename='file-directory.svg') }}" alt="Directory" width=13> {{ item.name }}</a>
+  {% elif item.class.startswith('item.videoItem') %}
+    <img src="{{ url_for('static', filename='device-desktop.svg') }}" alt="Video" width=13> {{ item.path | basename }} {# - <span class="url_to_copy" id="url_{{ item.detail_id }}">{{ BASE_URL }}{{ item.detail_id }}</span> #}
+    <button class="btn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"><img src="{{ url_for('static', filename='clippy.svg') }}" alt="Copy to clipboard" width=13></button>
+  {% elif item.class.startswith('item.audioItem') %}
+    <img src="{{ url_for('static', filename='unmute.svg') }}" alt="Audio" width=13> {{ item.path | basename }} {# - <span class="url_to_copy" id="url_{{ item.detail_id }}">{{ BASE_URL }}{{ item.detail_id }}</span> #}
+    <button class="btn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"><img src="{{ url_for('static', filename='clippy.svg') }}" alt="Copy to clipboard" width=13></button>
   {% else %}
-    {{ item.name }}
-    {# - <span class="url_to_copy" id="url_{{ item.detail_id }}">{{ BASE_URL }}{{ item.detail_id }}</span> #}
+    <img src="{{ url_for('static', filename='file-media.svg') }}" alt="Media" width=13> {{ item.path | basename }} {# - <span class="url_to_copy" id="url_{{ item.detail_id }}">{{ BASE_URL }}{{ item.detail_id }}</span> #}
     <button class="btn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"><img src="{{ url_for('static', filename='clippy.svg') }}" alt="Copy to clipboard" width=13></button>
   {% endif %}
 </li>
